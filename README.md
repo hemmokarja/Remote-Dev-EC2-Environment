@@ -63,7 +63,7 @@ The primary benefit of this project is the ability to quickly spin up a remote d
 
 ## Costs
 
-Running the remote instances incurs a marginal cost, which varies based on the region and is subject to change over time. As of September 16, 2024, the cost for a single default EC2 `t3.micro` instance in the `eu-north-1` region is $0.0108 per hour. Be sure to check the [latest AWS pricing](https://aws.amazon.com/ec2/pricing/on-demand/) for the most up-to-date information.
+Running the remote instances involves costs that depend primarily on instance type. The costs may also vary between regions and are subject to change over time. As of September 16, 2024, the cost for a single default EC2 `t3.micro` instance with 1 GB of RAM in the `eu-north-1` region is $0.0108 per hour. Be sure to check the [latest AWS pricing](https://aws.amazon.com/ec2/pricing/on-demand/) for the most up-to-date information.
 
 
 ## License
