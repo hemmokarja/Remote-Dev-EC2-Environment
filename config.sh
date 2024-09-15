@@ -1,0 +1,4 @@
+USERNAME="DevUser"
+REGION="eu-north-1"
+DEV_INSTANCE_TYPE="t3.micro"
+BASTION_INSTANCE_TYPE="t3.micro"
