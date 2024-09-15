@@ -7,7 +7,6 @@ resource "aws_security_group" "dev_sg" {
     to_port         = 22
     protocol        = "tcp"
     security_groups = [aws_security_group.bastion_sg.id]
-    # cidr_blocks = [var.local_public_ip]
   }
 
   egress {
@@ -25,7 +24,6 @@ resource "aws_instance" "dev_instance" {
   key_name               = aws_key_pair.ssh_key.key_name
   vpc_security_group_ids = [aws_security_group.dev_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.dev_instance_profile.name
-  # security_groups      = [aws_security_group.dev_sg.name]
 
   private_ip = var.dev_instance_private_ip
 
@@ -37,7 +35,7 @@ resource "aws_instance" "dev_instance" {
 
 data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["099720109477"] # canonical (Ubuntu) AWS account ID
+  owners      = ["099720109477"]
   filter {
     name   = "name"
     values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
