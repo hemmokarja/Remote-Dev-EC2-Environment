@@ -25,11 +25,13 @@ The primary benefit of this project is the ability to quickly spin up a remote d
 ## Configuration
 
 - **Main Configuration**: Edit the `config.sh` file to configure the following:
-  - `Region` (default: `eu-north-1`)
+  - Region (default: `eu-north-1`)
   - Development EC2 instance type (default: `t3.micro`, only 1 GB or RAM)
   - Bastion SEC2 instance type (default: `t3.micro`)
   - Username for tagging resources (default: `DevUser`)
+    - Note: Ensure your AWS account does not have conflicting EC2 tags.
 - **IAM Permissions**: If the default EC2 and S3 full access is not sufficient, adjust the permissions in `terraform/roles.tf`.
+- **Bootstrap Action**: If the default development toolkit is not sufficient (see "How to Use" for details), tailor the bootstrap script to suit your requirements in `terraform/scripts/bootstrap.sh`.
 
 ## How to Use
 
@@ -39,7 +41,7 @@ The primary benefit of this project is the ability to quickly spin up a remote d
   - Configures `~/.ssh/config` with aliases `remote-dev-ec2` and `remote-dev-bastion` for easy SSH access.
     - Note: Ensure your `~/.ssh/config` does not have conflicting aliases.
   - Bootstraps the development EC2 instance with a basic Python development toolkit:
-  - Pyenv for Python version management along with Python 3.12
+    - Pyenv for Python version management along with Python 3.12
     - Poetry for dependency management.
     - Docker for containerization.
   - **Important Security Check**: During the process, you will be prompted to confirm the authenticity of the hosts. You need to verify that the IP addresses match those provided in the output above. If they match, you can safely continue with the connection.
@@ -58,10 +60,6 @@ The primary benefit of this project is the ability to quickly spin up a remote d
 5. **Remove All Resources with `destroy.sh`**:
   - Destroys all AWS resources created by Terraform.
   - Restores the original state of `~/.ssh/config`.
-
-## Custom Bootstrap Logic
-
-- Adjust the bootstrap logic by modifying `terraform/scripts/bootstrap.sh` as needed to suit your development environment requirements.
 
 ## Costs
 
