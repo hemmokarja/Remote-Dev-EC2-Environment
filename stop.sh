@@ -10,7 +10,7 @@ fi
 
 # get the instance IDs based on the tag
 INSTANCE_IDS=$(aws ec2 describe-instances \
-  --filters "Name=tag:User,Values=$USERNAME" \
+  --filters "Name=tag:Name,Values=\"$USERNAME\"" \
   --query "Reservations[*].Instances[*].InstanceId" \
   --output text \
   --region $REGION)
