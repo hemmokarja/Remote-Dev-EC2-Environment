@@ -1,21 +1,24 @@
 #!/bin/bash
 
+
 wait_for_network_connectivity() {
-  local timeout=300
-  local start_time=$(date +%s)
+  local retries=30
+  local sleep_interval=5
 
-  until ping -c1 google.com &>/dev/null; do
-      echo "Waiting for network..."
-      sleep 5
-
-      if [ $(( $(date +%s) - start_time )) -ge $timeout ]; then
-          echo "Network connection timed out after 300 seconds. Could not bootstrap " \
-            "the dev instance with dev toolkit. Exiting."
-          exit 1
-      fi
+  for ((i=1; i<=retries; i++)); do
+    if ping -c1 google.com &>/dev/null; then
+      echo "Network is up!"
+      return 0
+    else
+      echo "Waiting for network... (attempt $i/$retries)"
+      sleep $sleep_interval
+    fi
   done
-}
 
+  echo "Network connection timed out after $retries attempts. Could not bootstrap " \
+    "the dev instance with dev toolkit. Exiting."
+  exit 1
+}
 
 source_bashrc() {
   # ubuntu's .bashrc starts with commands that prevent sourcing it within a shell script,

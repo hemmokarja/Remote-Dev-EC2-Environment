@@ -1,26 +1,26 @@
 #!/bin/bash
 
 BOOTSTRAP_SCRIPT_PATH_="$(pwd)/scripts/bootstrap.sh"
-RETRIES=30
-SLEEP_INTERVAL=5
 
 
 wait_for_ssh_connectivity() {
-  for i in $(seq 1 $RETRIES); do
+  local retries=30
+  local sleep_interval=5
+
+  for ((i=1; i<=retries; i++)); do
     ssh remote-dev-ec2 'echo SSH connection successful' > /dev/null 2>&1
     if [ $? -eq 0 ]; then
-      echo "SSH connection established on attempt #$i!"
-      break
+      echo "Established SSH connectivity!"
+      return 0
+    else
+      echo "Waiting for SSH connectivity... (attempt $i/$retries)"
+      sleep $sleep_interval
     fi
-    echo "SSH connection failed. Retrying in $SLEEP_INTERVAL seconds... (Attempt $i/$RETRIES)"
-    sleep $SLEEP_INTERVAL
   done
 
-  if [ $i -eq $RETRIES ]; then
-    echo "Failed to establish SSH connection after $RETRIES attempts. Cannot bootstrap" \
-      "the EC2 with Pyenv, Poetry and Docker. Please, do it manually."
-    exit 1
-  fi
+  echo "SSH connection timed out after $retries attempts. Could not bootstrap " \
+    "the dev instance with dev toolkit. Exiting."
+  exit 1
 }
 
 upload_bootstrap_to_dev_instance() {
