@@ -92,6 +92,7 @@ install_poetry() {
 }
 
 install_docker() {
+  set -e
   # https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04
   sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -99,6 +100,7 @@ install_docker() {
   apt-cache policy docker-ce
   sudo apt install -y docker-ce
   sudo usermod -aG docker ubuntu
+  echo "Docker installed successfully!"
 }
 
 
