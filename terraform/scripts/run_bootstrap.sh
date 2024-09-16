@@ -59,7 +59,6 @@ remove_bootstrap() {
 }
 
 
-
 wait_for_ssh_connectivity
 upload_bootstrap_to_dev_instance
 execute_bootstrap
