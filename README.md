@@ -31,7 +31,7 @@ The primary benefit of this project is the ability to quickly spin up a remote d
   - Username for tagging resources (default: `DevUser`)
     - Note: Ensure your AWS account does not have conflicting EC2 tags.
 - **IAM Permissions**: If the default EC2 and S3 full access is not sufficient, adjust the permissions in `terraform/roles.tf`.
-- **Bootstrap Action**: If the default development toolkit is not sufficient (see "How to Use" for details), tailor the bootstrap script to suit your requirements in `terraform/scripts/bootstrap.sh`.
+- **Bootstrap Action**: If the default development toolkit is not sufficient (see "How to Use" for details), tailor the bootstrap script to suit your requirements in `scripts/bootstrap.sh`.
 
 ## How to Use
 

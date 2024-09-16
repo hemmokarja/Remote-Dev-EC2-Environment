@@ -2,19 +2,18 @@
 
 source config.sh
 
-cd terraform
-
 KEY_NAME="remote-dev-ec2-key"
-SSH_DIR="$(pwd)/.ssh"
+SSH_DIR="$(pwd)/terraform/.ssh"
 PRIVATE_KEY_PATH="$SSH_DIR/$KEY_NAME"
 PUBLIC_KEY_PATH="$PRIVATE_KEY_PATH.pub"
 SSH_CONFIG_BACKUP_PATH="$SSH_DIR/config.bak"
 SSH_CONFIG_PATH="$HOME/.ssh/config"
+RUN_BOOTSTRAP_SCRIPT_PATH="$(pwd)/scripts/run_bootstrap.sh"
 DEV_INSTANCE_PRIVATE_IP="10.0.2.10"  # selected within the private subnet ip range
-BOOTSTRAP_SCRIPT_PATH="$(pwd)/scripts/run_bootstrap.sh"
 LOCAL_PUBLIC_IP=""
 BASTION_PUBLIC_IP=""
 
+cd terraform
 
 check_aws_env() {
   if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
@@ -111,11 +110,11 @@ configure_ssh_access() {
 }
 
 run_bootstrap() {
-  if [ -x "$BOOTSTRAP_SCRIPT_PATH" ]; then
+  if [ -x "$RUN_BOOTSTRAP_SCRIPT_PATH" ]; then
     echo "Running bootstrap script..."
-    $BOOTSTRAP_SCRIPT_PATH
+    $RUN_BOOTSTRAP_SCRIPT_PATH
   else
-    echo "Bootstrap script not found or not executable: $BOOTSTRAP_SCRIPT_PATH"
+    echo "Bootstrap script not found or not executable: $RUN_BOOTSTRAP_SCRIPT_PATH"
     exit 1
   fi
 }
@@ -131,8 +130,8 @@ configure_ssh_access
 echo "The private IP of the dev instance is: $DEV_INSTANCE_PRIVATE_IP"
 echo "The public IP of the bastion host is: $BASTION_PUBLIC_IP"
 
+cd - > /dev/null
+
 run_bootstrap
 
 echo "Your instance is ready for use! Login by running 'ssh remote-dev-ec2'."
-
-cd - > /dev/null

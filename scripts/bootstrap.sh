@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 wait_for_network_connectivity() {
   local retries=30
   local sleep_interval=5
