@@ -25,7 +25,7 @@ wait_for_ssh_connectivity() {
 
 upload_bootstrap_to_dev_instance() {
   echo "Uploading bootstrap script to the remote dev instance..."
-  scp "$BOOTSTRAP_SCRIPT_PATH_" remote-dev-ec2:$HOME/bootstrap.sh
+  scp "$BOOTSTRAP_SCRIPT_PATH_" remote-dev-ec2:/home/ubuntu/bootstrap.sh
 
   if [ $? -eq 0 ]; then
     echo "Bootstrap script uploaded successfully!"
@@ -37,7 +37,7 @@ upload_bootstrap_to_dev_instance() {
 
 execute_bootstrap() {
   echo "Executing bootstrap script on the remote dev instance..."
-  ssh remote-dev-ec2 $HOME/bootstrap.sh
+  ssh remote-dev-ec2 /home/ubuntu/bootstrap.sh
 
   if [ $? -eq 0 ]; then
     echo "Bootstrap script executed successfully!"
@@ -49,7 +49,7 @@ execute_bootstrap() {
 
 remove_bootstrap() {
   echo "Removing bootstrap script on the remote dev instance..."
-  ssh remote-dev-ec2 "rm -f $HOME/bootstrap.sh"
+  ssh remote-dev-ec2 "rm -f /home/ubuntu/bootstrap.sh"
   if [ $? -eq 0 ]; then
     echo "Bootstrap script removed successfully!"
   else
