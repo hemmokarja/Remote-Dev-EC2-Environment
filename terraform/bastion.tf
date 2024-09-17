@@ -6,14 +6,14 @@ resource "aws_instance" "bastion_instance" {
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
 
   tags = {
-    Name = "${var.username}'sBastionHost"
+    Name = "sBastionHost"
     User = var.username
   }
 }
 
 resource "aws_security_group" "bastion_sg" {
   vpc_id = aws_vpc.dev_vpc.id
-  name   = "${var.username}'sBastionEC2SecurityGroup"
+  name   = "${var.username}sBastionEC2SecurityGroup"
 
   ingress {
     from_port   = 22
@@ -27,6 +27,11 @@ resource "aws_security_group" "bastion_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.username}sBastionHostSecurityGroup"
+    User = var.username
   }
 }
 

@@ -1,17 +1,30 @@
 resource "aws_vpc" "dev_vpc" {
   cidr_block = "10.0.0.0/16"
+
+  tags = {
+    Name = "${var.username}sVPC"
+    User = var.username
+  }
 }
 
-
-# public subnet 
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.dev_vpc.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.username}sPublicSubnet"
+    User = var.username
+  }
 }
 
 resource "aws_internet_gateway" "dev_igw" {
   vpc_id = aws_vpc.dev_vpc.id
+
+  tags = {
+    Name = "${var.username}sIGW"
+    User = var.username
+  }
 }
 
 resource "aws_route_table" "dev_route_table" {
@@ -21,6 +34,11 @@ resource "aws_route_table" "dev_route_table" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.dev_igw.id
   }
+
+  tags = {
+    Name = "${var.username}sRouteTable"
+    User = var.username
+  }
 }
 
 resource "aws_route_table_association" "dev_route_table_association" {
@@ -28,20 +46,33 @@ resource "aws_route_table_association" "dev_route_table_association" {
   route_table_id = aws_route_table.dev_route_table.id
 }
 
-
-# private subnet
 resource "aws_subnet" "private_subnet" {
   vpc_id                  = aws_vpc.dev_vpc.id
   cidr_block              = "10.0.2.0/24"
   map_public_ip_on_launch = false
+
+  tags = {
+    Name = "${var.username}sPrivateSubnet"
+    User = var.username
+  }
 }
 
 resource "aws_nat_gateway" "nat_gw" {
   allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.public_subnet.id
+
+  tags = {
+    Name = "${var.username}sNATGateway"
+    User = var.username
+  }
 }
 
 resource "aws_eip" "nat_eip" {
+
+  tags = {
+    Name = "${var.username}sNATEIP"
+    User = var.username
+  }
 }
 
 resource "aws_route_table" "private_route_table" {
@@ -50,6 +81,11 @@ resource "aws_route_table" "private_route_table" {
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_nat_gateway.nat_gw.id
+  }
+
+  tags = {
+    Name = "${var.username}sPrivateRouteTable"
+    User = var.username
   }
 }
 

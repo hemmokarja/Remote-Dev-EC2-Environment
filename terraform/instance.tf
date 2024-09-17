@@ -9,14 +9,14 @@ resource "aws_instance" "dev_instance" {
   private_ip = var.dev_instance_private_ip
 
   tags = {
-    Name = "${var.username}'sDevEC2"
+    Name = "${var.username}sDevEC2"
     User = var.username
   }
 }
 
 resource "aws_security_group" "dev_sg" {
   vpc_id = aws_vpc.dev_vpc.id
-  name   = "${var.username}'sDevEC2SecurityGroup"
+  name   = "${var.username}sDevEC2SecurityGroup"
 
   ingress {
     from_port       = 22
@@ -30,6 +30,11 @@ resource "aws_security_group" "dev_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.username}sDevEC2SecurityGroup"
+    User = var.username
   }
 }
 

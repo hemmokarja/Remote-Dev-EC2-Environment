@@ -1,5 +1,5 @@
 resource "aws_iam_role" "dev_role" {
-  name = "DevEC2Role"
+  name = "${var.username}sDevEC2Role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -13,6 +13,11 @@ resource "aws_iam_role" "dev_role" {
       }
     ]
   })
+
+  tags = {
+    Name = "${var.username}sDevEC2Role"
+    User = var.username
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_full_access" {
@@ -28,4 +33,9 @@ resource "aws_iam_role_policy_attachment" "s3_full_access" {
 resource "aws_iam_instance_profile" "dev_instance_profile" {
   name = "DevEC2Profile"
   role = aws_iam_role.dev_role.name
+
+  tags = {
+    Name = "${var.username}sDevEC2Profile"
+    User = var.username
+  }
 }
