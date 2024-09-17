@@ -13,7 +13,7 @@ resource "aws_instance" "bastion_instance" {
 
 resource "aws_security_group" "bastion_sg" {
   vpc_id = aws_vpc.dev_vpc.id
-  name   = "BastionEC2SecurityGroup"
+  name   = "${var.username}'sBastionEC2SecurityGroup"
 
   ingress {
     from_port   = 22

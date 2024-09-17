@@ -102,7 +102,7 @@ The deployment is configured so that the development instance can only be access
 If your public IP has changed (for example, if you're using a dynamic IP or connected from a different network), the instance will no longer be accessible via SSH. 
 
 #### Solution:
-- **Update Security Group**: You will need to update the security group associated with the instance to allow SSH access from your new public IP. You can do this by modifying the security group rules of `BastionEC2SecurityGroup` in the AWS Console or using the AWS CLI:
+- **Update Security Group**: You will need to update the security group associated with the instance to allow SSH access from your new public IP. You can do this by modifying the security group rules of `<USERNAME>'sBastionEC2SecurityGroup` in the AWS Console or using the AWS CLI:
 
   ```bash
   aws ec2 authorize-security-group-ingress --group-id <security-group-id> --protocol tcp --port 22 --cidr <your-new-ip>/32

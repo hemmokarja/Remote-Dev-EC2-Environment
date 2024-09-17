@@ -16,7 +16,7 @@ resource "aws_instance" "dev_instance" {
 
 resource "aws_security_group" "dev_sg" {
   vpc_id = aws_vpc.dev_vpc.id
-  name   = "DevEC2SecurityGroup"
+  name   = "${var.username}'sDevEC2SecurityGroup"
 
   ingress {
     from_port       = 22
