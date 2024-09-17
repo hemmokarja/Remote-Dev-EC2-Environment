@@ -32,6 +32,35 @@ update_system() {
   sudo apt upgrade -y
 }
 
+install_aws_cli() {
+    echo "Installing AWS CLI for programmatic interaction with AWS..."
+    
+    echo "Installing dependencies..."
+    sudo apt install -y unzip
+
+    echo "Downloading AWS CLI..."
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+
+    echo "Unzipping AWS CLI installer..."
+    unzip awscliv2.zip
+
+    echo "Installing AWS CLI..."
+    sudo ./aws/install
+
+    echo "Verifying AWS CLI installation..."
+    if command -v aws > /dev/null 2>&1; then
+      echo "AWS CLI installed successfully! Version:"
+      aws --version
+    else
+      echo "AWS CLI installation failed or aws command not found."
+    fi
+
+    echo "Cleaning up..."
+    rm -rf awscliv2.zip aws
+
+    echo "AWS CLI installation complete!"
+}
+
 install_pyenv() {
   echo "Installing Pyenv for Python version management..."
 
@@ -40,10 +69,10 @@ install_pyenv() {
     libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
     xz-utils tk-dev libffi-dev liblzma-dev python3-openssl git
 
-  echo "Cloning pyenv repository..."
+  echo "Cloning Pyenv repository..."
   git clone https://github.com/pyenv/pyenv.git $HOME/.pyenv
 
-  echo "Setting up environment for pyenv..."
+  echo "Setting up environment for Pyenv..."
 
   echo '# Pyenv' >> $HOME/.bashrc
   echo 'export PYENV_ROOT="$HOME/.pyenv"' >> $HOME/.bashrc
@@ -52,7 +81,7 @@ install_pyenv() {
 
   source_bashrc
 
-  echo "Verifying pyenv installation..."
+  echo "Verifying Pyenv installation..."
   if command -v pyenv > /dev/null 2>&1; then
     
     echo "Pyenv installed successfully! Version:"
@@ -118,6 +147,7 @@ EOF
 
 wait_for_network_connectivity
 update_system
+install_aws_cli
 install_pyenv
 install_poetry
 install_docker
