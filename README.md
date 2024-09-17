@@ -68,11 +68,11 @@ If the default development toolkit is insufficient for your environment, you can
   - **Important Security Check**: During the process, you will be prompted to confirm the authenticity of the hosts. You must verify that the IP addresses match those provided in the output. If they match, you can safely proceed with the connection.
 
 ### Use the Instance
-  - Connect to the development instance from your local machine via Terminal using:  
+  - **Via Terminal**: Connect to the development instance from your local machine via Terminal using:  
     ```bash
     ssh <DEV_INSTANCE_SSH_ALIAS>
     ```
-  - You can also easily connect to the development instance from VS Code. First, install the Remote-SSH extension. Then, press `Shift+Cmd+P` to open the command palette. Search "Remote-SSH: Connect to Host", and press enter. You should see the configured `DEV_INSTANCE_SSH_ALIAS`. After selecting it, you can access the development instance's file system by pressing `Cmd+O`. For more info on Remote-SSH, see [here](https://code.visualstudio.com/docs/remote/ssh-tutorial)
+  - **Via VS Code**: You can also easily connect to the development instance from VS Code. First, install the Remote-SSH extension. Then, press `Shift+Cmd+P` to open the command palette. Search for "Remote-SSH: Connect to Host", and press enter. You should see the configured `DEV_INSTANCE_SSH_ALIAS`. After selecting it, you can access the development instance's file system by pressing `Cmd+O`. For more info on Remote-SSH, see [here](https://code.visualstudio.com/docs/remote/ssh-tutorial)
 
 ### Start Instances with `start.sh`
   - Starts both the development and bastion EC2 instances.
