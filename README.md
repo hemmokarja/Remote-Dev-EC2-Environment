@@ -67,7 +67,7 @@ If the default development toolkit is insufficient for your environment, you can
   - Bootstraps the development EC2 instance with a basic Python development toolkit (see the "Bootstrap Action" section for more details).
   - **Important Security Check**: During the process, you will be prompted to confirm the authenticity of the hosts. You must verify that the IP addresses match those provided in the output. If they match, you can safely proceed with the connection.
 
-### Use the Instance
+### Use Instance
   - **Via Terminal**: Connect to the development instance from your local machine via Terminal using:  
     ```bash
     ssh <DEV_INSTANCE_SSH_ALIAS>
