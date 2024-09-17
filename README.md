@@ -69,6 +69,7 @@ If the default development toolkit is insufficient for your environment, you can
 
 ### Use Instance
   - **Via Terminal**: Connect to the development instance from your local machine via Terminal using:  
+    
     ```bash
     ssh <DEV_INSTANCE_SSH_ALIAS>
     ```
