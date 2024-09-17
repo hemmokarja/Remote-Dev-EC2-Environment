@@ -1,5 +1,9 @@
 #!/bin/bash
 
+source config.sh
+
+echo "ssh alias: $DEV_INSTANCE_SSH_ALIAS"
+
 BOOTSTRAP_SCRIPT_PATH_="$(pwd)/scripts/bootstrap.sh"
 
 
@@ -8,7 +12,7 @@ wait_for_ssh_connectivity() {
   local sleep_interval=5
 
   for ((i=1; i<=retries; i++)); do
-    ssh remote-dev-ec2 'echo SSH connection successful' > /dev/null 2>&1
+    ssh "$DEV_INSTANCE_SSH_ALIAS" 'echo SSH connection successful' > /dev/null 2>&1
     if [ $? -eq 0 ]; then
       echo "Established SSH connectivity!"
       return 0
@@ -25,7 +29,7 @@ wait_for_ssh_connectivity() {
 
 upload_bootstrap_to_dev_instance() {
   echo "Uploading bootstrap script to the remote dev instance..."
-  scp "$BOOTSTRAP_SCRIPT_PATH_" remote-dev-ec2:/home/ubuntu/bootstrap.sh
+  scp "$BOOTSTRAP_SCRIPT_PATH_" "$DEV_INSTANCE_SSH_ALIAS:/home/ubuntu/bootstrap.sh"
 
   if [ $? -eq 0 ]; then
     echo "Bootstrap script uploaded successfully!"
@@ -37,7 +41,7 @@ upload_bootstrap_to_dev_instance() {
 
 execute_bootstrap() {
   echo "Executing bootstrap script on the remote dev instance..."
-  ssh remote-dev-ec2 /home/ubuntu/bootstrap.sh
+  ssh "$DEV_INSTANCE_SSH_ALIAS" /home/ubuntu/bootstrap.sh
 
   if [ $? -eq 0 ]; then
     echo "Bootstrap script executed successfully!"
@@ -49,7 +53,7 @@ execute_bootstrap() {
 
 remove_bootstrap() {
   echo "Removing bootstrap script on the remote dev instance..."
-  ssh remote-dev-ec2 "rm -f /home/ubuntu/bootstrap.sh"
+  ssh "$DEV_INSTANCE_SSH_ALIAS" "rm -f /home/ubuntu/bootstrap.sh"
   if [ $? -eq 0 ]; then
     echo "Bootstrap script removed successfully!"
   else

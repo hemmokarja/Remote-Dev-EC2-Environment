@@ -1,27 +1,18 @@
 #!/bin/bash
 
 source config.sh
+source ./scripts/util.sh
 
 cd terraform
 
-KEY_NAME="remote-dev-ec2-key"
+KEY_NAME="dev-env-key"
 SSH_DIR="$(pwd)/.ssh"
 PUBLIC_KEY_PATH="$SSH_DIR/$KEY_NAME.pub"
 DUMMY_IP="0.0.0.0"
-DEV_INSTANCE_PRIVATE_IP="10.0.2.10" 
 SSH_CONFIG_BACKUP_PATH="$SSH_DIR/config.bak"
 SSH_CONFIG_PATH="$HOME/.ssh/config"
 BASTION_INSTANCE_NAME="$USERNAME'sBastionHost"
 BASTION_PUBLIC_IP=""
-
-
-check_aws_env() {
-  if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
-    echo "AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be set as environment" \
-      "variables! Exiting." >&2
-    exit 1
-  fi
-}
 
 fetch_bastion_ip() {
   BASTION_PUBLIC_IP=$(aws ec2 describe-instances \
@@ -62,7 +53,7 @@ restore_original_ssh_config() {
   else
     echo "No backup found at $SSH_CONFIG_BACKUP_PATH. No changes made to SSH config." \
       "Review SSH config at $SSH_CONFIG_PATH and manually remove entries for" \
-      "remote-dev-ec2 and remote-dev-bastion."
+      "$DEV_INSTANCE_SSH_ALIAS and $BASTION_SSH_ALIAS."
   fi
 }
 
@@ -80,6 +71,7 @@ remove_ssh_dir() {
 }
 
 
+check_commands
 check_aws_env
 fetch_bastion_ip
 destroy_terraform

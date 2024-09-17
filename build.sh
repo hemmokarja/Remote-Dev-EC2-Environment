@@ -1,27 +1,19 @@
 #!/bin/bash
 
 source config.sh
+source ./scripts/util.sh
 
-KEY_NAME="remote-dev-ec2-key"
+KEY_NAME="dev-env-key"
 SSH_DIR="$(pwd)/terraform/.ssh"
 PRIVATE_KEY_PATH="$SSH_DIR/$KEY_NAME"
 PUBLIC_KEY_PATH="$PRIVATE_KEY_PATH.pub"
 SSH_CONFIG_BACKUP_PATH="$SSH_DIR/config.bak"
 SSH_CONFIG_PATH="$HOME/.ssh/config"
 RUN_BOOTSTRAP_SCRIPT_PATH="$(pwd)/scripts/run_bootstrap.sh"
-DEV_INSTANCE_PRIVATE_IP="10.0.2.10"  # selected within the private subnet ip range
 LOCAL_PUBLIC_IP=""
 BASTION_PUBLIC_IP=""
 
 cd terraform
-
-check_aws_env() {
-  if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
-    echo "AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be set as environment" \
-      "variables! Exiting." >&2
-    exit 1
-  fi
-}
 
 generate_ssh_keys() {
   if [ ! -d "$SSH_DIR" ]; then
@@ -67,11 +59,20 @@ apply_terraform() {
     -var "local_public_ip=$LOCAL_PUBLIC_IP/32" \
     -var "dev_instance_private_ip=$DEV_INSTANCE_PRIVATE_IP" \
     -auto-approve
+  
+  if [ $? -ne 0 ]; then
+    echo "Terraform apply failed. Exiting."
+    exit 1
+  fi
 
-  BASTION_PUBLIC_IP=$(terraform output -raw bastion_public_ip)
+  BASTION_PUBLIC_IP=$(terraform output -raw bastion_public_ip 2>/dev/null)
+  if [ $? -ne 0 ]; then
+    echo "Failed to obtain Bastion Host's public IP from Terraform output. Exiting."
+    exit 1
+  fi
+
   if [ -z "$BASTION_PUBLIC_IP" ]; then
-    echo "Failed to obtain Bastion Host's public IP from Terraform output. Exiting. \
-      Run build.sh to try again or destroy.sh to destroy resources."
+    echo "Bastion Host's public IP is empty. Exiting."
     exit 1
   fi
 }
@@ -87,25 +88,26 @@ configure_ssh_access() {
       "$SSH_CONFIG_BACKUP_PATH"
 
   SSH_CONFIG="
-  Host remote-dev-bastion
+  Host $BASTION_SSH_ALIAS
     HostName $BASTION_PUBLIC_IP
     User ubuntu
     IdentityFile $PRIVATE_KEY_PATH
 
-  Host remote-dev-ec2
+  Host $DEV_INSTANCE_SSH_ALIAS
     HostName $DEV_INSTANCE_PRIVATE_IP
     User ubuntu
     IdentityFile $PRIVATE_KEY_PATH
-    ProxyJump remote-dev-bastion
+    ProxyJump $BASTION_SSH_ALIAS
   "
 
-  if ! grep -q "Host remote-dev-bastion" "$SSH_CONFIG_PATH"; then
-    echo "Adding SSH config for remote-dev-bastion and remote-dev-ec2 to ~/.ssh/config..."
+  if ! grep -q "Host $BASTION_SSH_ALIAS" "$SSH_CONFIG_PATH"; then
+    echo "Adding SSH config for $BASTION_SSH_ALIAS and $DEV_INSTANCE_SSH_ALIAS to" \
+      "~/.ssh/config..."
     echo "$SSH_CONFIG" >> "$SSH_CONFIG_PATH"
     echo "Config added."
   else
-    echo "SSH config for for remote-dev-bastion and remote-dev-ec2 already exists." \
-      "Skipping addition."
+    echo "SSH config for for $BASTION_SSH_ALIAS and $DEV_INSTANCE_SSH_ALIAS already" \
+      "exists." "Skipping addition."
   fi
 }
 
@@ -120,6 +122,7 @@ run_bootstrap() {
 }
 
 
+check_commands
 check_aws_env
 generate_ssh_keys
 fetch_local_ip
@@ -134,4 +137,4 @@ cd - > /dev/null
 
 run_bootstrap
 
-echo "Your instance is ready for use! Login by running 'ssh remote-dev-ec2'."
+echo "Your instance is ready for use! Login by running 'ssh $DEV_INSTANCE_SSH_ALIAS'."

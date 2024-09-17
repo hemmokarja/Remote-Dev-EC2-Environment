@@ -6,7 +6,7 @@ The primary benefit of this project is the ability to quickly spin up a remote d
 
 ## Infrastructure Includes
 
-- **Development EC2 Instance**: An EC2 instance configured for development work.
+- **Development EC2 Instance**: An EC2 instance with the most recent Ubuntu AMI, configured for development work.
 - **Bastion EC2 Instance**: A bastion host that serves as a secure gateway to access the development EC2 instance. This instance is exposed to the public internet, allowing you to connect to it and then access the development instance.
 - **VPC**: A Virtual Private Cloud for network isolation.
 - **Private Subnet**: A subnet within the VPC where the development EC2 instance is located.
@@ -21,50 +21,99 @@ The primary benefit of this project is the ability to quickly spin up a remote d
 - **AWS Account**: An active AWS account to create and manage resources.
 - **AWS CLI**: Installed on your local machine (follow the [official installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)).
 - **AWS Access Keys**: Set up as environment variables (`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`).
+- **SSH**: Ensure `ssh` is installed on your machine to allow secure remote connections.
 
 ## Configuration
 
-- **Main Configuration**: Edit the `config.sh` file to configure the following:
-  - Region (default: `eu-north-1`)
-  - Development EC2 instance type (default: `t3.micro`, only 1 GB or RAM)
-  - Bastion SEC2 instance type (default: `t3.micro`)
-  - Username for tagging resources (default: `DevUser`)
-    - Note: Ensure your AWS account does not have conflicting EC2 tags.
-- **IAM Permissions**: If the default EC2 and S3 full access is not sufficient, adjust the permissions in `terraform/roles.tf`.
-- **Bootstrap Action**: If the default development toolkit is not sufficient (see "How to Use" for details), tailor the bootstrap script to suit your requirements in `scripts/bootstrap.sh`.
+### Main Configuration
+
+Edit the `config.sh` file to configure the following settings:
+- **Region**: The AWS region where resources will be deployed (default: `eu-north-1`).
+- **Development EC2 Instance Type**: Type of the EC2 instance used for development (default: `t3.micro`).
+- **Bastion EC2 Instance Type**: Type of the EC2 instance used for the bastion host (default: `t3.micro`).
+- **Username for Tagging Resources**: Username used for tagging AWS resources (default: `DevUser`).
+  - Ensure that your AWS account does not have conflicting EC2 tags using the same username.
+- **Development Instance SSH Alias**: Alias to be used in the SSH configuration file for connecting to the development EC2 instance (default: `remote-dev-ec2`).
+  - Ensure that your SSH configuration file (`~/.ssh/config`) does not have conflicting aliases.
+- **Bastion Instance SSH Alias**: Alias to be used in the SSH configuration file for connecting to the bastion EC2 instance (default: `remote-bastion-ec2`).
+  - Ensure that your SSH configuration file (`~/.ssh/config`) does not have conflicting aliases.
+- **Development Instance Private IP**: Private IP address assigned to the development EC2 instance (default: `10.0.2.10`).
+  - There should not be a reason to change this. However, if you need to do so, ensure that the IP address is within the private subnet's CIDR block `10.0.2.0/24` and does not conflict with other private IP addresses within the network (e.g., AWS always reserves the first four and the last IP in a subnet for its own use).
+
+### IAM Permissions
+
+The deployment uses default EC2 and S3 full access for development instances. If these permissions are not sufficient for your use case, you can customize them as needed in the `terraform/roles.tf` file.
+
+### Bootstrap Action
+
+The deployment bootstraps the development EC2 with the following development toolkit:
+- AWS CLI for programmatic interaction with AWS
+- Pyenv for Python version management
+- Poetry for dependency management
+- Docker for containerization
+- Python 3.12
+- Bash prompt with current Git branch
+
+If the default development toolkit is insufficient for your environment, you can customize the script `scripts/bootstrap.sh` to meet your needs.
+
+(Note: Ubuntu AMI comes with Git installed by default.)
 
 ## How to Use
 
-1. **Build Resources with `build.sh`**:
+### Build Resources with `build.sh`
   - Generates SSH keys for accessing EC2 instances (stored in `terraform/.ssh/`).
-  - Creates the necessary AWS resources.
-  - Configures `~/.ssh/config` with aliases `remote-dev-ec2` and `remote-dev-bastion` for easy SSH access.
-    - Note: Ensure your `~/.ssh/config` does not have conflicting aliases.
-  - Bootstraps the development EC2 instance with a basic Python development toolkit:
-    - Pyenv for Python version management along with Python 3.12
-    - Poetry for dependency management.
-    - Docker for containerization.
-  - **Important Security Check**: During the process, you will be prompted to confirm the authenticity of the hosts. You need to verify that the IP addresses match those provided in the output above. If they match, you can safely continue with the connection.
+  - Creates the necessary AWS resources using Terraform.
+  - Configures `~/.ssh/config` with aliases specified in `config.sh` for easy SSH access.
+  - Bootstraps the development EC2 instance with a basic Python development toolkit (see the "Bootstrap Action" section for more details).
+  - **Important Security Check**: During the process, you will be prompted to confirm the authenticity of the hosts. You must verify that the IP addresses match those provided in the output. If they match, you can safely proceed with the connection.
 
-2. **Use the Instance**:
-   - Connect to the development instance from your local machine with `ssh remote-dev-ec2`.
+### Use the Instance
+  - Connect to the development instance from your local machine via Terminal using:  
+    ```bash
+    ssh <DEV_INSTANCE_SSH_ALIAS>
+    ```
+  - You can also easily connect to the development instance from VS Code. First, install the Remote-SSH extension. Then, press `Shift+Cmd+P` to open the command palette. Search "Remote-SSH: Connect to Host", and press enter. You should see the configured `DEV_INSTANCE_SSH_ALIAS`. After selecting it, you can access the development instance's file system by pressing `Cmd+O`. For more info on Remote-SSH, see [here](https://code.visualstudio.com/docs/remote/ssh-tutorial)
 
-3. **Start the Instaces with `start.sh`**:
-   - Starts the development and bastion EC2 instances (not required directly after `build.sh`).
+### Start Instances with `start.sh`
+  - Starts both the development and bastion EC2 instances.
+  - This step is not required immediately after running `build.sh`, as the instances are already started.
 
-4. **Stop the Instances with `stop.sh`**:
+### Stop Instances with `stop.sh`
   - Stops the development and bastion EC2 instances without terminating them.
-    - Stopping instances will preserve the state of the instance and all data on the attached EBS volumes (disks).
-    - The instances can be started again later without data loss, as long as the EBS volumes are not set to be deleted on termination.
+  - Stopping instances preserves their state and all data on attached EBS volumes (disks).
+  - The instances can be restarted later without data loss, as long as the EBS volumes are not set to delete on termination.
 
-5. **Remove All Resources with `destroy.sh`**:
+### Remove Resources with `destroy.sh`
   - Destroys all AWS resources created by Terraform.
-  - Restores the original state of `~/.ssh/config`.
+  - Restores the original state of `~/.ssh/config`, removing the added SSH aliases.
+
 
 ## Costs
 
 Running the remote instances involves costs that depend primarily on instance type. The costs may also vary between regions and are subject to change over time. As of September 16, 2024, the cost for a single default EC2 `t3.micro` instance with 1 GB of RAM in the `eu-north-1` region is $0.0108 per hour. Be sure to check the [latest AWS pricing](https://aws.amazon.com/ec2/pricing/on-demand/) for the most up-to-date information.
 
+
+## Troubleshoot
+
+### Why can't I access the development instance via SSH?
+
+The deployment is configured so that the development instance can only be accessed via SSH from the public IP address of the user at the time the resources are built. This ensures security by restricting access to only your IP.
+
+If your public IP has changed (for example, if you're using a dynamic IP or connected from a different network), the instance will no longer be accessible via SSH. 
+
+#### Solution:
+- **Update Security Group**: You will need to update the security group associated with the instance to allow SSH access from your new public IP. You can do this by modifying the security group rules of `BastionEC2SecurityGroup` in the AWS Console or using the AWS CLI:
+
+  ```bash
+  aws ec2 authorize-security-group-ingress --group-id <security-group-id> --protocol tcp --port 22 --cidr <your-new-ip>/32
+  ```
+
+- **Sync Terraform State**: After making manual changes to the security group, you should sync the local Terraform state to reflect these changes. This helps Terraform to stay aware of the current state of your infrastructure:
+
+  ```bash
+  cd terraform
+  terraform refresh
+  ```
 
 ## License
 
