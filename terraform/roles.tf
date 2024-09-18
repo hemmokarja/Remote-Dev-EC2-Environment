@@ -31,7 +31,7 @@ resource "aws_iam_role_policy_attachment" "s3_full_access" {
 }
 
 resource "aws_iam_instance_profile" "dev_instance_profile" {
-  name = "DevEC2Profile"
+  name = "${var.username}sDevEC2Profile"
   role = aws_iam_role.dev_role.name
 
   tags = {
